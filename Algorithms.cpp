@@ -1,3 +1,5 @@
+//hagitdahan101@gmail.com
+//315158568
 #include "Algorithms.hpp"
 #include "BellmanFord.hpp"
 #include "Dijkstra.hpp"
@@ -15,9 +17,6 @@ namespace ariel{
             }
         }
     }
-    //To check if the graph is connected i will run BFS algirithm
-    //from all the vertexs in the graph.
-    //if the Graph is connected return 1 else return 0
     bool Algorithms::isConnected(Graph &g) {
         const vector<vector<int>> matrix=g.getAdjancencyMatrix();
         size_t numVertices=g.getNumVertices();
@@ -40,21 +39,40 @@ namespace ariel{
 
         return true; // Graph is strongly connected
     }
-    //this function use bellmanford to check the shortest path
     string Algorithms::shortestPath(Graph& g, int source, int destination) {
-        if(g.getEdgeTyoe()==EdgeType::ALLOW_NEGATIVE){
+        int totalWeight1=0;
+        int totalWeight2=0;
+        vector<vector<int>> adjMat=g.getAdjancencyMatrix();
+        if(g.getNumEdges()==0) return "-1";
+        if(g.getEdgeType()==EdgeType::ALLOW_NEGATIVE){
             vector<int> shortest= vector<int>(g.getNumVertices());
+            vector<int> shortest2= vector<int>(g.getNumVertices());
             shortest=BellmanFord::ShortestPathB(g,source,destination);
-            if (!shortest.empty()) {
-                string pathStr = to_string(shortest.at(0));
-                for (size_t i = 1; i < shortest.size(); ++i) {
-                    pathStr += "->" + to_string(shortest.at(i));
-                }
-                //pathStr += "\n";
-            return pathStr;
-            }
+            if(shortest.empty()) return "-1";
+            totalWeight1=BellmanFord::CalculatePathCost(shortest,adjMat);
+            if(g.getGraphType()==GraphType::UNDIRECTED) {
+                shortest2 = BellmanFord::ShortestPathB(g, destination, source);
+                totalWeight2 = BellmanFord::CalculatePathCost(shortest2, adjMat);
 
-            return "-1" ;
+                if (totalWeight1 <= totalWeight2) {
+                    string pathStr = to_string(shortest.at(0));
+                    for (size_t i = 1; i < shortest.size(); ++i) {
+                        pathStr += "->" + to_string(shortest.at(i));
+                    }
+                    return pathStr;
+                }
+                reverse(shortest2.begin(), shortest2.end());
+                string pathStr = to_string(shortest2.at(0));
+                for (size_t i = 1; i < shortest2.size(); ++i) {
+                    pathStr += "->" + to_string(shortest2.at(i));
+                }
+                return pathStr;
+            }
+            string pathStr = to_string(shortest.at(0));
+            for (size_t i = 1; i < shortest.size(); ++i) {
+                pathStr += "->" + to_string(shortest.at(i));
+            }
+            return pathStr;
         }
         else {
             string path=Dijkstra::shortestPathDijkstra(g,source,destination);
@@ -94,7 +112,6 @@ namespace ariel{
         colors[size_t(vertex)] = "BLACK"; // All neighbors visited, mark vertex as done
         return ""; // No cycle found
     }
-    //run DFS if there is BackEdge there is cycle else there is no cycle.
     string Algorithms::isContainsCycle(Graph& g) {
         vector<vector<int>> adj=g.getAdjancencyMatrix();
         size_t numOfVertices=g.getNumVertices();
@@ -114,63 +131,64 @@ namespace ariel{
 
         return "No cycle exsist"; // No cycle found
     }
-
-
     string Algorithms::isBipartite(Graph& g) {
-            size_t n = g.getNumVertices(); // Number of vertices
-            vector<vector<int>> adj=g.getAdjancencyMatrix();
-            vector<string> color(n, "WHITE");  // Vector to store the color of each vertex
-            vector<int> groupA; //the BLUE vertex
-            vector<int> groupB; //the RED vertex
-            for (size_t u = 0; u < n; ++u) {
-                if (color[u] == "WHITE") {
-                    color[u] = "BLUE";  // Start vertex is colored BLUE
-                    groupA.push_back(u);
-                    queue<int> Q;
-                    Q.push(u);          // Initialize queue with start vertex
+        size_t n = g.getNumVertices(); // Number of vertices
+        vector<vector<int>> adj=g.getAdjancencyMatrix();
+        vector<string> color(n, "WHITE");  // Vector to store the color of each vertex
+        vector<int> groupA; //the BLUE vertex
+        vector<int> groupB; //the RED vertex
+        for (size_t u = 0; u < n; ++u) {
+            if (color[u] == "WHITE") {
+                color[u] = "BLUE";  // Start vertex is colored BLUE
+                groupA.push_back(u);
+                queue<int> Q;
+                Q.push(u);          // Initialize queue with start vertex
 
-                    while (!Q.empty()) {
-                        int u = Q.front();
-                        Q.pop();
-                        for (size_t v = 0; v < n; ++v) {
-                            if (adj[size_t(u)][v] !=0) { // If there is an edge between u and v
-                                if (color[v] == color[size_t(u)]) {  // If adjacent vertices have the same color, not bipartite
-                                    return "Graph is not bipartite";
+                while (!Q.empty()) {
+                    int u = Q.front();
+                    Q.pop();
+                    for (size_t v = 0; v < n; ++v) {
+                        if (adj[size_t(u)][v] !=0) { // If there is an edge between u and v
+                            if (color[v] == color[size_t(u)]) {  // If adjacent vertices have the same color, not bipartite
+                                return "Graph is not bipartite";
+                            }
+                            if (color[v] == "WHITE") {
+                                if (color[size_t(u)] == "BLUE") {
+                                    color[v] = "RED";
+                                    groupB.push_back(v);
+                                } else {
+                                    color[v] = "BLUE";
+                                    groupA.push_back(v);
                                 }
-                                if (color[v] == "WHITE") {
-                                    if (color[size_t(u)] == "BLUE") {
-                                        color[v] = "RED";
-                                        groupB.push_back(v);
-                                    } else {
-                                        color[v] = "BLUE";
-                                        groupA.push_back(v);
-                                    }
-                                    Q.push(v);  // Enqueue v
-                                }
+                                Q.push(v);  // Enqueue v
                             }
                         }
                     }
                 }
             }
-            string groups="The Graph is bipartite: A={";
-            for (int vertex : groupA) {
-                groups += to_string(vertex) + " ";
-            }
-            groups+="}, B={";
-            for (int vertex : groupB) {
-                groups += to_string(vertex) + " ";
-            }
-            groups+="}";
-            return groups;
+        }
+        string groups="The Graph is bipartite: A={";
+        for (int vertex : groupA) {
+            groups += to_string(vertex) + " ";
+        }
+        groups+="}, B={";
+        for (int vertex : groupB) {
+            groups += to_string(vertex) + " ";
+        }
+        groups+="}";
+        return groups;
     }
     string Algorithms::negativeCycle(Graph& g){
         vector<int> cycle= BellmanFord::findNegativeCycle(g);
-        string cyclePth="the Negative Cycle is:";
-        for (int vertex : cycle) {
-            cyclePth += to_string(vertex) + " ";
+        if (!cycle.empty()){
+            string cyclePth="the Negative Cycle is:";
+            for (int vertex : cycle) {
+                cyclePth += to_string(vertex) + " ";
+            }
+            return cyclePth;
         }
-        return cyclePth;
+        return "";
 
     }
 
-    }
+}

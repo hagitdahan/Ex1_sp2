@@ -1,4 +1,5 @@
-
+//hagitdahan101@gmail.com
+//315158568
 #include "Graph.hpp"
 #include "GraphType.hpp"
 using namespace std;
@@ -6,21 +7,21 @@ namespace ariel{
 
     Graph::Graph(): numOfVertices(0), numEdges(0), adjancencyMatrix(), graphType(GraphType::UNDIRECTED), weightType(WeightType::UNWEIGHTED), edgeType(EdgeType::NON_NEGATIVE) {}
 
-    const vector<vector<int>> Graph::getAdjancencyMatrix(){
-        return adjancencyMatrix;
-    }
+    const vector<vector<int>> Graph::getAdjancencyMatrix(){return adjancencyMatrix;}
     bool Graph::isValid(const vector<vector<int>>& matrix){
         // Check if the matrix is square
         size_t size = matrix.size();
-        for (const auto& row : matrix) {
-            if (row.size() != size ) {
-                return false;
+        for(size_t j=0;j<size;j++) {
+            {
+                if (matrix[j].size() != size) {
+                    return false;
+                }
             }
         }
         //check if there is edge in adj[i][i]
-        for(size_t i;i<size;i++){
-            for(size_t j;j<size;j++){
-                if(matrix[i][j]!=0) return false;
+        for(size_t i=0;i<size;i++){
+            for(size_t j=0;j<size;j++){
+                if(matrix[i][j]!=0 && i==j) return false;
             }
         }
         if(size==1) return false;
@@ -31,7 +32,7 @@ namespace ariel{
     void Graph::loadGraph(const vector<vector<int>> &matrix) {
         // Check if the graph is a square matrix
         if (!isValid(matrix)) {
-            throw invalid_argument("Invalid graph: The graph is not a square matrix.");
+            throw std::invalid_argument("Invalid graph: The graph is not a square matrix.");
         }
 
         // Load the graph data
@@ -41,37 +42,41 @@ namespace ariel{
 
             // Count the number of edges if needed
             numEdges = 0;
-            for (const auto& row : adjancencyMatrix) {
-                for (int val : row) {
-                    if (val != 0) {
+            for (size_t i = 0; i < numOfVertices; ++i) {
+                for (size_t j = 0; j < numOfVertices; ++j) {
+                    if (adjancencyMatrix[i][j] != 0) {
                         ++numEdges;
                     }
                 }
             }
-
+            graphType = GraphType::UNDIRECTED;
             // Check if the graph is directed
             for (size_t i = 0; i < numOfVertices; ++i) {
-                for (size_t j = 0; j < i; ++j) {
+                for (size_t j = 0; j < numOfVertices; ++j) {
                     if (adjancencyMatrix[i][j] != adjancencyMatrix[j][i]) {
                         graphType = GraphType::DIRECTED;
+                        break;
                     }
                 }
             }
-
+            if(graphType==GraphType::UNDIRECTED) this->numEdges=this->numEdges/2;
+            edgeType = EdgeType::NON_NEGATIVE;
             // Check if there are negative edges
             for (size_t i = 0; i < numOfVertices; ++i) {
                 for (size_t j = 0; j < numOfVertices; ++j) {
                     if (adjancencyMatrix[i][j] < 0) {
                         edgeType = EdgeType::ALLOW_NEGATIVE;
+                        break;
                     }
                 }
             }
-
+            weightType = WeightType::UNWEIGHTED;
             // Check if the edges are weighted
             for (size_t i = 0; i < numOfVertices; ++i) {
                 for (size_t j = 0; j < numOfVertices; ++j) {
                     if (adjancencyMatrix[i][j] != 1 && adjancencyMatrix[i][j] != 0) {
                         weightType = WeightType::WEIGHTED;
+                        break;
                     }
                 }
             }
@@ -93,7 +98,6 @@ namespace ariel{
 
     }
     size_t Graph::getNumVertices(){return this->numOfVertices;}
-
     vector<int> Graph::getNeighbors(int vertex){
         vector<int> neighbors;
         for (size_t i = 0; i < adjancencyMatrix[size_t(vertex)].size(); ++i) {
@@ -105,8 +109,9 @@ namespace ariel{
     }
     GraphType Graph::getGraphType(){return this->graphType;}
     WeightType Graph::getWeightType(){return this->weightType;}
-    EdgeType Graph::getEdgeTyoe(){return this->edgeType;}
+    EdgeType Graph::getEdgeType(){return this->edgeType;}
     int Graph::getWeight(int u,int v){return adjancencyMatrix[size_t(u)][size_t(v)];}
+    int Graph::getNumEdges() {return this->numEdges;}
 
 
 

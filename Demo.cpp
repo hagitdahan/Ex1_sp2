@@ -1,8 +1,5 @@
-/*
- * Demo program for Exercise 2.
- * Author: Benjamin Saldman.
- */
-
+//hagitdahan101@gmail.com
+//315158568
 #include "Graph.hpp"
 #include "Algorithms.hpp"
 using ariel::Algorithms;
@@ -13,8 +10,8 @@ using namespace std;
 
 int main()
 {
-    ariel::Graph g;
-    // 3x3 matrix that represents a connected graph.
+      ariel::Graph g;
+    //3x3 matrix that represents a connected graph.
     vector<vector<int>> graph = {
             {0, 1, 0},
             {1, 0, 1},
@@ -59,12 +56,15 @@ int main()
     cout << Algorithms::isBipartite(g) << endl;        // Should print: "The graph is bipartite: A={0, 2, 4}, B={1, 3}."
 
     // 5x4 matrix that reprsents invalid graph.
-    vector<vector<int>> graph4 = {
-            {0, 1, 2, 0},
-            {1, 0, 3, 0},
-            {2, 3, 0, 4},
-            {0, 0, 4, 0},
-            {0, 0, 0, 5}};
+//    vector<vector<int>> graph4 = {
+//            {0, 1, 2, 0},
+//            {1, 0, 3, 0},
+//            {2, 3, 0, 4},
+//            {0, 0, 4, 0},
+//            {0, 0, 0, 5}};
+    vector<vector<int>> graph4={{0,1,1},
+                                {0,1,1},
+                                {0,1,0}};
     try
     {
         g.loadGraph(graph4); // Load the graph to the object.
@@ -88,7 +88,21 @@ int main()
                                 {0, 0, 0, 0, 2},
                                 {0, 0, 0, 0, 0}};
     g.loadGraph(graph6);
-    g.printGraph();
     cout<<Algorithms::shortestPath(g,3,4)<<endl;
     cout<<Algorithms::negativeCycle(g)<<endl;
+    vector<vector<int>> graph7={{0, 10, -1, 1, 0},
+                                {10, 0, 10, 0, 0},
+                                {-1, 10, 0, 0, 2},
+                                {1, 0, 0, 0, 0},
+                                {0, 0, 2, 0, 0}};
+    g.loadGraph(graph7);
+    g.printGraph();
+    cout<<Algorithms::shortestPath(g,1,0)<<endl;
+    cout<<Algorithms::shortestPath(g,1,2)<<endl;
+    cout<<Algorithms::negativeCycle(g)<<endl;
+    cout<<Algorithms::isConnected(g)<<endl;
+
+
+
+
 }

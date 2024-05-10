@@ -1,4 +1,5 @@
-
+//hagitdahan101@gmail.com
+//315158568
 #ifndef GRAPH_HPP
 #define GRAPH_HPP
 #include <vector>
@@ -18,8 +19,9 @@ namespace ariel{
         size_t getNumVertices();
         GraphType getGraphType();
         WeightType getWeightType();
-        EdgeType getEdgeTyoe();
+        EdgeType getEdgeType();
         int getWeight(int u,int v);
+        int getNumEdges();
         //~Graph();
 
     private:
@@ -29,8 +31,6 @@ namespace ariel{
         GraphType graphType;
         WeightType weightType;
         EdgeType edgeType;
-
-
     };
 }
 #endif

@@ -1,3 +1,5 @@
+//hagitdahan101@gmail.com
+//315158568
 #ifndef GRAPHTYPE_HPP
 #define GRAPHTYPE_HPP
 // Enum to represent the type of graph

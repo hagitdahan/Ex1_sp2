@@ -1,22 +1,29 @@
+//hagitdahan101@gmail.com
+//315158568
 #include "BellmanFord.hpp"
 #include "Algorithms.hpp"
+#include "GraphType.hpp"
 using namespace std;
 namespace ariel{
-vector<int> BellmanFord::ShortestPathB(Graph &g, int start, int end) {
+    vector<int> BellmanFord::ShortestPathB(Graph &g, int start, int end) {
         vector<vector<int>> adjacencyMatrix = g.getAdjancencyMatrix();
         size_t numVertices = g.getNumVertices();
         vector<bool> visited(numVertices, false);
         Algorithms::dfs(g, start, visited);
         vector<int> dist(numVertices, numeric_limits<int>::max());
         dist[size_t(start)] = 0;
-
+        vector<int> parent(numVertices,-1);
         // Relax all edges V-1 times
         for (size_t i = 0; i < numVertices - 1; ++i) {
             for (size_t u = 0; u < numVertices; ++u) {
                 for (size_t v = 0; v < numVertices; ++v) {
                     if (adjacencyMatrix[u][v] != 0 && dist[u] !=numeric_limits<int>::max() &&
                         dist[u] + adjacencyMatrix[u][v] < dist[v] && visited[v] == true) {
+                        if(g.getGraphType()==GraphType::UNDIRECTED && parent[u] == v) {
+                            continue;
+                        }
                         dist[v] = dist[u] + adjacencyMatrix[u][v];
+                        parent[v]=u;
                     }
                 }
             }
@@ -27,6 +34,9 @@ vector<int> BellmanFord::ShortestPathB(Graph &g, int start, int end) {
             for (size_t v = 0; v < numVertices; ++v) {
                 if (adjacencyMatrix[u][v] != 0 && dist[u] != numeric_limits<int>::max() &&
                     dist[u] + adjacencyMatrix[u][v] < dist[v]) {
+                    if(g.getGraphType()==GraphType::UNDIRECTED && parent[u] == v) {
+                        continue;
+                    }
                     cerr << "Graph contains negative cycle" << endl;
                     return {}; // Return empty vector indicating negative cycle
                 }
@@ -50,7 +60,7 @@ vector<int> BellmanFord::ShortestPathB(Graph &g, int start, int end) {
         reverse(shortestPath.begin(), shortestPath.end());
 
         return shortestPath;
-}
+    }
     vector<int> BellmanFord::findNegativeCycle(Graph& g) {
         vector<int> cycle;
         vector<vector<int>> adjacencyMatrix = g.getAdjancencyMatrix();
@@ -68,6 +78,9 @@ vector<int> BellmanFord::ShortestPathB(Graph &g, int start, int end) {
                 for (size_t v = 0; v < numVertices; ++v) {
                     if (adjacencyMatrix[u][v] != 0 && dist[u] != numeric_limits<int>::max() &&
                         dist[u] + adjacencyMatrix[u][v] < dist[v]) {
+                        if(g.getGraphType()==GraphType::UNDIRECTED && parent[u] == v) {
+                            continue;
+                        }
                         dist[v] = dist[u] + adjacencyMatrix[u][v];
                         parent[v] = u; // Update parent vector
                     }
@@ -80,6 +93,9 @@ vector<int> BellmanFord::ShortestPathB(Graph &g, int start, int end) {
             for (size_t v = 0; v < numVertices; ++v) {
                 if (adjacencyMatrix[u][v] != 0 && dist[u] != numeric_limits<int>::max() &&
                     dist[u] + adjacencyMatrix[u][v] < dist[v]) {
+                    if(g.getGraphType()==GraphType::UNDIRECTED && parent[u] == v) {
+                        continue;
+                    }
                     // Found negative cycle, reconstruct it
                     int current = u;
                     while (parent[size_t(current)] != -1 && parent[size_t(current)] != u) { // Stop when cycle is completed
@@ -96,6 +112,13 @@ vector<int> BellmanFord::ShortestPathB(Graph &g, int start, int end) {
 
         // No negative cycle found
         return {};
+    }
+    int BellmanFord::CalculatePathCost(vector<int>& path, vector<vector<int>>& adjacencyMatrix) {
+        int totalCost = 0;
+        for (size_t i = 0; i < path.size() - 1; ++i) {
+            totalCost += adjacencyMatrix[size_t(path[i])][size_t(path[i + 1])];
+        }
+        return totalCost;
     }
 }
 
